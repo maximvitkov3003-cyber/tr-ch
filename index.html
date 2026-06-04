@@ -2,9 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Тараклия-Кишинев</title>
-    <!-- Подключаем официальный скрипт Telegram -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -14,23 +13,21 @@
             --hint-color: #8e8e93;
             --button-bg: #007aff;
             --button-text: #ffffff;
-            --input-border: #e5e5ea;
         }
 
-        /* Автоматическая адаптация под темную/светлую тему Telegram */
+        /* Настройки для ТЕМНОЙ темы (включая OLED черный) */
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-color: #000000;
-                --block-bg: #1c1c1e;
+                --bg-color: #000000;      /* Абсолютно черный фон */
+                --block-bg: #1c1c1e;     /* Контрастные темно-серые блоки Apple */
                 --text-color: #ffffff;
                 --hint-color: #8e8e93;
-                --input-border: #3a3a3c;
             }
         }
 
-        /* Если Telegram передает свои переменные, приоритет им */
+        /* Коррекция под темы самого Telegram */
         body.tg-theme {
-            --bg-color: var(--tg-theme-bg-color, #f2f2f7);
+            --bg-color: var(--tg-theme-bg-color, #000000);
             --block-bg: var(--tg-theme-secondary-bg-color, #1c1c1e);
             --text-color: var(--tg-theme-text-color, #ffffff);
             --hint-color: var(--tg-theme-hint-color, #8e8e93);
@@ -46,29 +43,19 @@
             padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 12px;
             box-sizing: border-box;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Стильные iOS блоки-карточки */
-        .ios-group {
+        /* Блоки в стиле Apple */
+        .ios-block {
             background-color: var(--block-bg);
-            border-radius: 12px;
-            padding: 0 16px;
+            border-radius: 14px;
+            padding: 12px 16px;
             display: flex;
             flex-direction: column;
-        }
-
-        .ios-row {
-            display: flex;
-            flex-direction: column;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--input-border);
-        }
-
-        .ios-row:last-child {
-            border-bottom: none;
+            box-sizing: border-box;
         }
 
         label {
@@ -76,49 +63,60 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: var(--hint-color);
-            margin-bottom: 6px;
-            font-weight: 500;
+            margin-bottom: 4px;
+            font-weight: 600;
+            display: block;
+            text-align: left;
         }
 
-        /* Выравнивание для всех инпутов строго ПО ЛЕВОМУ КРАЮ */
-        select, input {
+        /* Выравнивание по левому краю для списков */
+        select {
             width: 100%;
             background: transparent;
             border: none;
             color: var(--text-color);
             font-size: 17px;
             padding: 4px 0;
-            box-sizing: border-box;
             outline: none;
             font-family: inherit;
-            text-align: left !important; /* Жесткое выравнивание влево */
-            -webkit-appearance: none; /* Убираем нативные стрелочки Safari */
+            text-align: left;
+            -webkit-appearance: none; /* Фикс стрелочек iOS */
         }
 
-        /* Специфичный фикс для Айфонов, чтобы время не прыгало в центр */
-        input[type="time"] {
-            text-align: left;
+        /* Мощный фикс часов для Айфона, чтобы стояли СЛЕВА */
+        .time-container {
             display: flex;
             justify-content: flex-start;
-            align-items: center;
+            width: 100%;
+        }
+
+        input[type="time"] {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 17px;
+            padding: 4px 0;
+            outline: none;
+            font-family: inherit;
+            text-align: left !important;
+            -webkit-appearance: none;
+            display: inline-block;
+            width: auto; /* Не дает растягиваться и центрироваться на iOS */
         }
 
         .hint-text {
             font-size: 13px;
             color: var(--hint-color);
             text-align: center;
-            margin-top: 10px;
-            padding: 0 20px;
-            line-height: 1.4;
+            margin: 8px 0;
         }
 
-        /* Контейнер для кнопок внизу */
+        /* Кнопки управления */
         .action-buttons {
-            margin-top: auto;
+            margin-top: 10px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            padding-bottom: 20px;
+            gap: 8px;
         }
 
         .btn {
@@ -130,7 +128,7 @@
             text-align: center;
             border: none;
             cursor: pointer;
-            transition: opacity 0.2s ease;
+            box-sizing: border-box;
         }
 
         .btn:active {
@@ -144,50 +142,47 @@
 
         .btn-cancel {
             background-color: transparent;
-            color: #ff3b30; /* Нативный красный цвет Apple для отмены */
+            color: #ff3b30;
             font-weight: 500;
         }
     </style>
 </head>
 <body>
 
-    <!-- Единый блочный контейнер в стиле Настроек iOS -->
-    <div class="ios-group">
-        <div class="ios-row">
-            <label>Направление</label>
-            <select id="direction">
-                <option value="Кишинев ➔ Тараклия">Кишинев ➔ Тараклия</option>
-                <option value="Тараклия ➔ Кишинев">Тараклия ➔ Кишинев</option>
-            </select>
-        </div>
+    <div class="ios-block">
+        <label>Направление</label>
+        <select id="direction">
+            <option value="Кишинев ➔ Тараклия">Кишинев ➔ Тараклия</option>
+            <option value="Тараклия ➔ Кишинев">Тараклия ➔ Кишинев</option>
+        </select>
+    </div>
 
-        <div class="ios-row">
-            <label>День выезда</label>
-            <select id="date"></select>
-        </div>
+    <div class="ios-block">
+        <label>День выезда</label>
+        <select id="date"></select>
+    </div>
 
-        <div class="ios-row">
-            <label>Время выезда</label>
-            <!-- Фикс левого края работает тут -->
+    <div class="ios-block">
+        <label>Время выезда</label>
+        <div class="time-container">
             <input type="time" id="time" value="18:00">
         </div>
+    </div>
 
-        <div class="ios-row">
-            <label>Свободных мест</label>
-            <select id="seats">
-                <option value="1">1 место</option>
-                <option value="2">2 места</option>
-                <option value="3">3 места</option>
-                <option value="4" selected>4 места</option>
-                <option value="5">5 мест</option>
-                <option value="6">6 мест</option>
-            </select>
-        </div>
+    <div class="ios-block">
+        <label>Свободных мест</label>
+        <select id="seats">
+            <option value="1">1 место</option>
+            <option value="2">2 места</option>
+            <option value="3">3 места</option>
+            <option value="4" selected>4 места</option>
+            <option value="5">5 мест</option>
+            <option value="6">6 мест</option>
+        </select>
     </div>
 
     <div class="hint-text">Заполни данные и нажми на кнопку внизу экрана</div>
 
-    <!-- Блок кнопок -->
     <div class="action-buttons">
         <button class="btn btn-main" id="submitBtn">Создать поездку 🚗</button>
         <button class="btn btn-cancel" id="cancelBtn">Отмена</button>
@@ -195,10 +190,10 @@
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Разворачиваем на весь экран
+        tg.expand();
         document.body.classList.add('tg-theme');
 
-        // Автоматическая генерация дат (Сегодня, Завтра и т.д.)
+        // Автогенерация дат под русский интерфейс
         const dateSelect = document.getElementById('date');
         const days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
         const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
@@ -220,7 +215,7 @@
             dateSelect.appendChild(option);
         }
 
-        // Отправка данных при клике "Создать поездку"
+        // Обработка кнопки Создать (ИСПРАВЛЕНО!)
         document.getElementById('submitBtn').addEventListener('click', () => {
             const data = {
                 direction: document.getElementById('direction').value,
@@ -228,11 +223,12 @@
                 time: document.getElementById('time').value,
                 seats: document.getElementById('seats').value
             };
-            tg.sendData(json.stringify(data));
+            // Использован правильный JSON.stringify
+            tg.sendData(JSON.stringify(data));
             tg.close();
         });
 
-        // Кнопка Отмена — просто закрывает мини-приложение
+        // Обработка кнопки Отмена
         document.getElementById('cancelBtn').addEventListener('click', () => {
             tg.close();
         });
