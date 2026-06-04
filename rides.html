@@ -11,7 +11,7 @@
             --block-bg: #ffffff;
             --text-color: #000000;
             --hint-color: #8e8e93;
-            --divider: #e5e5ea;
+            --badge-bg: #e5e5ea;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -20,7 +20,7 @@
                 --block-bg: #1c1c1e;     
                 --text-color: #ffffff;
                 --hint-color: #8e8e93;
-                --divider: #2c2c2e;
+                --badge-bg: #2c2c2e;
             }
         }
 
@@ -57,7 +57,7 @@
             padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             box-sizing: border-box;
         }
 
@@ -65,6 +65,18 @@
             font-size: 17px;
             font-weight: 600;
             color: var(--text-color);
+        }
+
+        /* Красивая плашка направления */
+        .direction-badge {
+            background-color: var(--badge-bg);
+            color: var(--text-color);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+            align-self: flex-start;
         }
 
         .ride-info {
@@ -79,20 +91,20 @@
             color: var(--hint-color);
         }
 
-        /* Кнопка Бронирования внутри карточки */
+        /* Кнопка Бронирования */
         .btn-book {
             width: 100%;
-            border-radius: 10px;
-            font-size: 15px;
+            border-radius: 12px;
+            font-size: 16px;
             font-weight: 600;
-            padding: 10px;
+            padding: 12px;
             text-align: center;
             border: none;
             cursor: pointer;
             box-sizing: border-box;
             color: #ffffff;
-            background-color: #34c759; /* Приятный зеленый */
-            margin-top: 8px;
+            background-color: #34c759; /* Зеленый Apple фон */
+            margin-top: 4px;
             transition: opacity 0.1s ease;
         }
 
@@ -107,7 +119,6 @@
             font-size: 17px;
         }
 
-        /* Кнопка Закрыть в самом низу */
         .btn-close {
             width: 100%;
             border-radius: 12px;
@@ -120,14 +131,13 @@
             box-sizing: border-box;
             color: #ffffff;
             background-color: #ff3b30; /* Красный */
-            margin-top: auto;
-            padding-bottom: 14px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-    <h2 id="title-dir">Доступные поездки</h2>
+    <h2>Доступные рейсы</h2>
     
     <div id="rides-container"></div>
 
@@ -138,13 +148,9 @@
         tg.expand();
         document.body.classList.add('tg-theme');
 
-        // Получаем данные, которые бот передал в Mini App через URL параметры
         const urlParams = new URLSearchParams(window.location.search);
-        const direction = urlParams.get('dir') || '';
         const ridesDataRaw = urlParams.get('data') || '[]';
         
-        document.getElementById('title-dir').textContent = direction ? direction : "Поездки";
-
         const container = document.getElementById('rides-container');
         const rides = JSON.parse(decodeURIComponent(ridesDataRaw));
 
@@ -152,16 +158,17 @@
             container.innerHTML = '<div class="no-rides">Пока нет активных поездок 🤷‍♂️</div>';
         } else {
             rides.forEach(ride => {
-                // ride = [ride_id, driver_name, driver_username, date_text, time_text, free_seats]
+                // Структура: [ride_id, d_name, d_user, d_text, t_text, free_seats, direction]
                 const card = document.createElement('div');
                 card.className = 'ride-card';
                 
                 card.innerHTML = `
+                    <div class="direction-badge">📍 ${ride[6]}</div>
                     <div class="ride-header">🚗 Водитель: ${ride[1]} (${ride[2]})</div>
                     <div class="ride-info">
-                        <div><span>Дата:</span> ${ride[3]}</div>
-                        <div><span>Время:</span> ${ride[4]}</div>
-                        <div><span>Осталось мест:</span> ${ride[5]}</div>
+                        <div><span>Дата выезда:</span> ${ride[3]}</div>
+                        <div><span>Время выезда:</span> ${ride[4]}</div>
+                        <div><span>Свободно мест:</span> ${ride[5]}</div>
                     </div>
                     <button class="btn-book" onclick="bookRide(${ride[0]})">Забронировать место</button>
                 `;
@@ -169,7 +176,6 @@
             });
         }
 
-        // Функция отправки ID выбранной поездки обратно в бот
         function bookRide(rideId) {
             const result = { action: "book", ride_id: rideId };
             tg.sendData(JSON.stringify(result));
