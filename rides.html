@@ -11,8 +11,7 @@
             --block-bg: #ffffff;
             --text-color: #000000;
             --hint-color: #8e8e93;
-            --badge-bg: #e5e5ea; /* Светлый фон для светлой темы */
-            --badge-text: #000000;
+            --badge-bg: rgba(0, 0, 0, 0.05); /* Легкий серый островок для светлой темы */
         }
 
         @media (prefers-color-scheme: dark) {
@@ -21,8 +20,7 @@
                 --block-bg: #1c1c1e;     
                 --text-color: #ffffff;
                 --hint-color: #8e8e93;
-                --badge-bg: #2c2c2e; /* Темный фон для темной темы */
-                --badge-text: #ffffff;
+                --badge-bg: rgba(255, 255, 255, 0.1); /* Легкий светлый островок для темной темы */
             }
         }
 
@@ -31,8 +29,8 @@
             --block-bg: var(--tg-theme-secondary-bg-color, #1c1c1e);
             --text-color: var(--tg-theme-text-color, #ffffff);
             --hint-color: var(--tg-theme-hint-color, #8e8e93);
-            --badge-bg: var(--tg-theme-bg-color, #2c2c2e);
-            --badge-text: var(--tg-theme-text-color, #ffffff);
+            /* Автоматический подбор приятного фона островка на основе темы Telegram */
+            --badge-bg: var(--tg-theme-bg-color, rgba(0, 0, 0, 0.05));
         }
 
         body {
@@ -68,19 +66,20 @@
             font-size: 17px;
             font-weight: 600;
             color: var(--text-color);
+            margin-top: 4px;
         }
 
-        /* ИСПРАВЛЕННЫЙ И АДАПТИВНЫЙ БЭЙДЖ НАПРАВЛЕНИЯ */
+        /* КРАСИВЫЙ НЕЙТРАЛЬНЫЙ ОСТРОВОК НАПРАВЛЕНИЯ */
         .direction-badge {
             background-color: var(--badge-bg);
-            color: var(--badge-text);
+            color: var(--text-color); /* Буквы всегда цвета темы (черные на белом, белые на черном) */
             padding: 6px 12px;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             display: inline-block;
             align-self: flex-start;
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 1px solid rgba(128, 128, 128, 0.15);
         }
 
         .ride-info {
@@ -161,195 +160,6 @@
             container.innerHTML = '<div class="no-rides">Пока нет активных поездок 🤷‍♂️</div>';
         } else {
             rides.forEach(ride => {
-                const card = document.createElement('div');
-                card.className = 'ride-card';
-                
-                card.innerHTML = `
-                    <div class="direction-badge">📍 ${ride[6]}</div>
-                    <div class="ride-header">🚗 Водитель: ${ride[1]} (${ride[2]})</div>
-                    <div class="ride-info">
-                        <div><span>Дата выезда:</span> ${ride[3]}</div>
-                        <div><span>Время выезда:</span> ${ride[4]}</div>
-                        <div><span>Свободно мест:</span> ${ride[5]}</div>
-                    </div>
-                    <button class="btn-book" onclick="bookRide(${ride[0]})">Забронировать место</button>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function bookRide(rideId) {
-            const result = { action: "book", ride_id: rideId };
-            tg.sendData(JSON.stringify(result));
-            tg.close();
-        }
-
-        document.getElementById('closeBtn').addEventListener('click', () => {
-            tg.close();
-        });
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Доступные поездки</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --bg-color: #f2f2f7;
-            --block-bg: #ffffff;
-            --text-color: #000000;
-            --hint-color: #8e8e93;
-            --badge-bg: #e5e5ea;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #000000;      
-                --block-bg: #1c1c1e;     
-                --text-color: #ffffff;
-                --hint-color: #8e8e93;
-                --badge-bg: #2c2c2e;
-            }
-        }
-
-        body.tg-theme {
-            --bg-color: var(--tg-theme-bg-color, #000000);
-            --block-bg: var(--tg-theme-secondary-bg-color, #1c1c1e);
-            --text-color: var(--tg-theme-text-color, #ffffff);
-            --hint-color: var(--tg-theme-hint-color, #8e8e93);
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        h2 {
-            font-size: 22px;
-            font-weight: 700;
-            margin: 10px 0 5px 4px;
-        }
-
-        /* Карточка поездки */
-        .ride-card {
-            background-color: var(--block-bg);
-            border-radius: 14px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            box-sizing: border-box;
-        }
-
-        .ride-header {
-            font-size: 17px;
-            font-weight: 600;
-            color: var(--text-color);
-        }
-
-        /* Красивая плашка направления */
-        .direction-badge {
-            background-color: var(--badge-bg);
-            color: var(--text-color);
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            display: inline-block;
-            align-self: flex-start;
-        }
-
-        .ride-info {
-            font-size: 15px;
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .ride-info span {
-            color: var(--hint-color);
-        }
-
-        /* Кнопка Бронирования */
-        .btn-book {
-            width: 100%;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            padding: 12px;
-            text-align: center;
-            border: none;
-            cursor: pointer;
-            box-sizing: border-box;
-            color: #ffffff;
-            background-color: #34c759; /* Зеленый Apple фон */
-            margin-top: 4px;
-            transition: opacity 0.1s ease;
-        }
-
-        .btn-book:active {
-            opacity: 0.8;
-        }
-
-        .no-rides {
-            text-align: center;
-            color: var(--hint-color);
-            margin-top: 40px;
-            font-size: 17px;
-        }
-
-        .btn-close {
-            width: 100%;
-            border-radius: 12px;
-            font-size: 17px;
-            font-weight: 600;
-            padding: 14px;
-            text-align: center;
-            border: none;
-            cursor: pointer;
-            box-sizing: border-box;
-            color: #ffffff;
-            background-color: #ff3b30; /* Красный */
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-
-    <h2>Доступные рейсы</h2>
-    
-    <div id="rides-container"></div>
-
-    <button class="btn-close" id="closeBtn">Закрыть</button>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        document.body.classList.add('tg-theme');
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const ridesDataRaw = urlParams.get('data') || '[]';
-        
-        const container = document.getElementById('rides-container');
-        const rides = JSON.parse(decodeURIComponent(ridesDataRaw));
-
-        if (rides.length === 0) {
-            container.innerHTML = '<div class="no-rides">Пока нет активных поездок 🤷‍♂️</div>';
-        } else {
-            rides.forEach(ride => {
-                // Структура: [ride_id, d_name, d_user, d_text, t_text, free_seats, direction]
                 const card = document.createElement('div');
                 card.className = 'ride-card';
                 
