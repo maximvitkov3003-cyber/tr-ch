@@ -105,12 +105,12 @@
             margin: 8px 0;
         }
 
-        /* Кнопки управления в одном стиле */
+        /* Кнопки управления с цветным фоном */
         .action-buttons {
             margin-top: 10px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 10px;
         }
 
         .btn {
@@ -123,23 +123,22 @@
             border: none;
             cursor: pointer;
             box-sizing: border-box;
+            color: #ffffff; /* Белый текст для всех кнопок */
+            transition: opacity 0.1s ease;
         }
 
         .btn:active {
-            opacity: 0.5;
+            opacity: 0.8; /* Эффект нажатия в стиле iOS */
         }
 
-        /* Зеленая прозрачная кнопка */
+        /* Зеленый фон для создания */
         .btn-main {
-            background-color: transparent;
-            color: #34c759;
+            background-color: #34c759; 
         }
 
-        /* Красная прозрачная кнопка */
+        /* Красный фон для отмены */
         .btn-cancel {
-            background-color: transparent;
-            color: #ff3b30;
-            font-weight: 500;
+            background-color: #ff3b30; 
         }
     </style>
 </head>
