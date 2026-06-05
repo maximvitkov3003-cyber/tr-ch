@@ -2,190 +2,250 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Доступные поездки</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Доступные рейсы</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #f2f2f7;
-            --block-bg: #ffffff;
-            --text-color: #000000;
-            --hint-color: #8e8e93;
-            --badge-bg: rgba(0, 0, 0, 0.05); /* Легкий серый островок для светлой темы */
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #000000;      
-                --block-bg: #1c1c1e;     
-                --text-color: #ffffff;
-                --hint-color: #8e8e93;
-                --badge-bg: rgba(255, 255, 255, 0.1); /* Легкий светлый островок для темной темы */
-            }
-        }
-
-        body.tg-theme {
-            --bg-color: var(--tg-theme-bg-color, #000000);
-            --block-bg: var(--tg-theme-secondary-bg-color, #1c1c1e);
-            --text-color: var(--tg-theme-text-color, #ffffff);
-            --hint-color: var(--tg-theme-hint-color, #8e8e93);
-            /* Автоматический подбор приятного фона островка на основе темы Telegram */
-            --badge-bg: var(--tg-theme-bg-color, rgba(0, 0, 0, 0.05));
+            --tg-theme-bg-color: #fff;
+            --tg-theme-text-color: #000;
+            --tg-theme-button-color: #2481cc;
+            --tg-theme-button-text-color: #fff;
+            --tg-theme-secondary-bg-color: #efeff4;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--tg-theme-secondary-bg-color, #f4f4f7);
+            color: var(--tg-theme-text-color, #000);
             margin: 0;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
+            padding: 15px;
+            padding-bottom: 80px;
         }
 
         h2 {
+            text-align: center;
+            margin-bottom: 15px;
             font-size: 22px;
-            font-weight: 700;
-            margin: 10px 0 5px 4px;
         }
 
-        .ride-card {
-            background-color: var(--block-bg);
-            border-radius: 14px;
-            padding: 16px;
+        /* Стиль для контейнера вкладок (Табов) */
+        .tabs-container {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
-            box-sizing: border-box;
+            background: #e2e2e6;
+            padding: 3px;
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
 
-        .ride-header {
-            font-size: 17px;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-top: 4px;
-        }
-
-        /* КРАСИВЫЙ НЕЙТРАЛЬНЫЙ ОСТРОВОК НАПРАВЛЕНИЯ */
-        .direction-badge {
-            background-color: var(--badge-bg);
-            color: var(--text-color); /* Буквы всегда цвета темы (черные на белом, белые на черном) */
-            padding: 6px 12px;
-            border-radius: 8px;
+        .tab-button {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 10px;
             font-size: 14px;
             font-weight: 600;
-            display: inline-block;
-            align-self: flex-start;
-            border: 1px solid rgba(128, 128, 128, 0.15);
-        }
-
-        .ride-info {
-            font-size: 15px;
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .ride-info span {
-            color: var(--hint-color);
-        }
-
-        .btn-book {
-            width: 100%;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            padding: 12px;
-            text-align: center;
-            border: none;
+            border-radius: 8px;
             cursor: pointer;
-            box-sizing: border-box;
-            color: #ffffff;
-            background-color: #34c759;
-            margin-top: 4px;
-            transition: opacity 0.1s ease;
+            color: #555;
+            transition: all 0.2s ease;
         }
 
-        .btn-book:active {
-            opacity: 0.8;
+        /* Активная вкладка */
+        .tab-button.active {
+            background: #fff;
+            color: #000;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Стили карточек рейсов */
+        .ride-card {
+            background-color: var(--tg-theme-bg-color, #fff);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .direction-badge {
+            display: inline-block;
+            background: #333;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .driver-info {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .ride-details {
+            font-size: 14px;
+            color: #666;
+            margin: 4px 0;
+        }
+
+        .book-btn {
+            width: 100%;
+            background-color: #2ec761;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            margin-top: 12px;
+            cursor: pointer;
+        }
+
+        .book-btn:active {
+            filter: brightness(0.9);
         }
 
         .no-rides {
             text-align: center;
-            color: var(--hint-color);
+            color: #8e8e93;
             margin-top: 40px;
-            font-size: 17px;
+            font-size: 16px;
         }
 
-        .btn-close {
+        /* Фиксированная кнопка Закрыть в самом низу */
+        .close-btn-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            background: linear-gradient(to top, var(--tg-theme-secondary-bg-color) 80%, transparent);
+        }
+
+        .close-btn {
             width: 100%;
-            border-radius: 12px;
-            font-size: 17px;
-            font-weight: 600;
-            padding: 14px;
-            text-align: center;
-            border: none;
-            cursor: pointer;
-            box-sizing: border-box;
-            color: #ffffff;
             background-color: #ff3b30;
-            margin-top: 20px;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <h2>Доступные рейсы</h2>
-    
-    <div id="rides-container"></div>
+    <h2>Доступные рейсы 🚗</h2>
 
-    <button class="btn-close" id="closeBtn">Закрыть</button>
+    <div class="tabs-container">
+        <button class="tab-button active" onclick="switchTab('all')">Все</button>
+        <button class="tab-button" onclick="switchTab('to_chisinau')">В Кишинёв</button>
+        <button class="tab-button" onclick="switchTab('to_taraclia')">В Тараклию</button>
+    </div>
+
+    <div id="rides-list"></div>
+
+    <div class="close-btn-container">
+        <button class="close-btn" onclick="closeApp()">Закрыть</button>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand();
-        document.body.classList.add('tg-theme');
+        tg.expand(); // Расширяем на весь экран
 
+        let allRides = [];
+        let currentTab = 'all'; // Может быть: all, to_chisinau, to_taraclia
+
+        // Чтение данных из URL-параметра ?data=...
         const urlParams = new URLSearchParams(window.location.search);
-        const ridesDataRaw = urlParams.get('data') || '[]';
-        
-        const container = document.getElementById('rides-container');
-        const rides = JSON.parse(decodeURIComponent(ridesDataRaw));
+        const rawData = urlParams.get('data');
 
-        if (rides.length === 0) {
-            container.innerHTML = '<div class="no-rides">Пока нет активных поездок 🤷‍♂️</div>';
-        } else {
-            rides.forEach(ride => {
+        if (rawData) {
+            try {
+                allRides = JSON.parse(decodeURIComponent(rawData));
+            } catch (e) {
+                console.error("Ошибка парсинга данных:", e);
+            }
+        }
+
+        // Функция переключения вкладок
+        function switchTab(tabName) {
+            currentTab = tabName;
+            
+            // Меняем визуально активную кнопку в дизайне
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            if (tabName === 'all') document.querySelectorAll('.tab-button')[0].classList.add('active');
+            if (tabName === 'to_chisinau') document.querySelectorAll('.tab-button')[1].classList.add('active');
+            if (tabName === 'to_taraclia') document.querySelectorAll('.tab-button')[2].classList.add('active');
+
+            // Перерисовываем список с учетом выбранного фильтра
+            renderRides();
+        }
+
+        // Функция рендеринга (вывода) поездок на экран
+        function renderRides() {
+            const container = document.getElementById('rides-list');
+            container.innerHTML = '';
+
+            // Фильтруем массив в зависимости от выбранной вкладки
+            const filteredRides = allRides.filter(ride => {
+                const direction = ride[6]; // Направление лежит в 6-м элементе массива рейса
+                
+                if (currentTab === 'to_chisinau') {
+                    // Проверяем, что пункт назначения — Кишинёв
+                    return direction.includes('Кишинев') || direction.includes('Кишинёв');
+                }
+                if (currentTab === 'to_taraclia') {
+                    // Проверяем, что пункт назначения — Тараклия
+                    return direction.includes('Тараклия');
+                }
+                return true; // Если вкладка 'all', показываем всё
+            });
+
+            if (filteredRides.length === 0) {
+                container.innerHTML = '<div class="no-rides">Пока нет активных поездок в этом направлении 🤷‍♂️</div>';
+                return;
+            }
+
+            // Создаем карточки для отфильтрованных рейсов
+            filteredRides.forEach(ride => {
+                const [rideId, driverName, driverUser, dateText, timeText, freeSeats, direction] = ride;
+
                 const card = document.createElement('div');
                 card.className = 'ride-card';
-                
                 card.innerHTML = `
-                    <div class="direction-badge">📍 ${ride[6]}</div>
-                    <div class="ride-header">🚗 Водитель: ${ride[1]} (${ride[2]})</div>
-                    <div class="ride-info">
-                        <div><span>Дата выезда:</span> ${ride[3]}</div>
-                        <div><span>Время выезда:</span> ${ride[4]}</div>
-                        <div><span>Свободно мест:</span> ${ride[5]}</div>
-                    </div>
-                    <button class="btn-book" onclick="bookRide(${ride[0]})">Забронировать место</button>
+                    <div class="direction-badge">📍 ${direction}</div>
+                    <div class="driver-info">🚗 Водитель: ${driverName} (${driverUser})</div>
+                    <div class="ride-details">📅 Дата выезда: ${dateText}</div>
+                    <div class="ride-details">🕒 Время выезда: ${timeText}</div>
+                    <div class="ride-details">💺 Свободно мест: <b>${freeSeats}</b></div>
+                    <button class="book-btn" onclick="bookRide(${rideId})">Забронировать место</button>
                 `;
                 container.appendChild(card);
             });
         }
 
+        // Функция отправки данных о бронировании в бот
         function bookRide(rideId) {
-            const result = { action: "book", ride_id: rideId };
-            tg.sendData(JSON.stringify(result));
+            const dataToSend = {
+                action: "book",
+                ride_id: rideId
+            };
+            tg.sendData(JSON.stringify(dataToSend));
+        }
+
+        function closeApp() {
             tg.close();
         }
 
-        document.getElementById('closeBtn').addEventListener('click', () => {
-            tg.close();
-        });
+        // Первый запуск вывода при открытии страницы
+        renderRides();
     </script>
 </body>
 </html>
