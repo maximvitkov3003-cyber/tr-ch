@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Доступные рейсы</title>
+    <!-- Подключаем стили Telegram Web App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -52,7 +53,7 @@
             transition: all 0.2s ease;
         }
 
-        /* Активная вкладка полностью подстраивается под тему Telegram (становится синей/акцентной) */
+        /* Активная вкладка подстраивается под тему Telegram (становится синей/акцентной) */
         .tab-button.active {
             background-color: var(--tg-theme-button-color, #2481cc);
             color: var(--tg-theme-button-text-color, #fff);
@@ -142,12 +143,14 @@
 
     <h2>Доступные рейсы 🚗</h2>
 
+    <!-- БЛОК ВКЛАДОК -->
     <div class="tabs-container">
         <button class="tab-button active" onclick="switchTab('all')">Все</button>
         <button class="tab-button" onclick="switchTab('to_chisinau')">В Кишинёв</button>
         <button class="tab-button" onclick="switchTab('to_taraclia')">В Тараклию</button>
     </div>
 
+    <!-- Контейнер для карточек -->
     <div id="rides-list"></div>
 
     <div class="close-btn-container">
@@ -161,7 +164,7 @@
         let allRides = [];
         let currentTab = 'all'; 
 
-        // Чтение данных
+        // Чтение переданных данных из URL
         const urlParams = new URLSearchParams(window.location.search);
         const rawData = urlParams.get('data');
 
@@ -173,6 +176,7 @@
             }
         }
 
+        // Переключение визуального стиля вкладок
         function switchTab(tabName) {
             currentTab = tabName;
             
@@ -186,22 +190,24 @@
             renderRides();
         }
 
+        // Фильтрация и вывод карточек на экран
         function renderRides() {
             const container = document.getElementById('rides-list');
             container.innerHTML = '';
 
             const filteredRides = allRides.filter(ride => {
-                const direction = String(ride[6] || "").toLowerCase(); // Безопасно приводим к нижнему регистру
+                // Извлекаем строку направления, убираем пробелы по краям и переводим в нижний регистр
+                const direction = String(ride[6] || "").toLowerCase().trim();
                 
                 if (currentTab === 'to_chisinau') {
-                    // Умная проверка: ищет куда едет машина. 
-                    // Если строка направления заканчивается на Кишинев или содержит стрелочку перед ним.
-                    return direction.includes('кишинев') || direction.includes('кишинёв');
+                    // Строка должна строго заканчиваться на пункт назначения ("кишинев" или "кишинёв")
+                    return direction.endsWith('кишинев') || direction.endsWith('кишинёв');
                 }
                 if (currentTab === 'to_taraclia') {
-                    return direction.includes('тараклия');
+                    // Строка должна строго заканчиваться на пункт назначения "тараклия"
+                    return direction.endsWith('тараклия');
                 }
-                return true; 
+                return true; // Вкладка 'all' — возвращаем все элементы
             });
 
             if (filteredRides.length === 0) {
@@ -209,6 +215,7 @@
                 return;
             }
 
+            // Отрисовка карточек
             filteredRides.forEach(ride => {
                 const [rideId, driverName, driverUser, dateText, timeText, freeSeats, direction] = ride;
 
@@ -226,6 +233,7 @@
             });
         }
 
+        // Бронирование поездки
         function bookRide(rideId) {
             const dataToSend = {
                 action: "book",
@@ -238,6 +246,7 @@
             tg.close();
         }
 
+        // Первичный рендеринг при загрузке страницы
         renderRides();
     </script>
 </body>
